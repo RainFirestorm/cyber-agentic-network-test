@@ -12,6 +12,7 @@ dispatch_token = os.environ["DISPATCH_TOKEN"]
 repo = os.environ.get("REPO", "")
 pr_number = os.environ.get("PR_NUMBER", "")
 head_sha = os.environ.get("HEAD_SHA", "") or ""
+head_ref = os.environ.get("HEAD_REF", "") or ""
 author = os.environ.get("PR_AUTHOR", "") or ""
 
 payload = {
@@ -20,6 +21,7 @@ payload = {
         "target_repo": repo,
         "target_pr_number": pr_number,
         "head_sha": head_sha,
+        "head_ref": head_ref,
         "author": author,
         "event_type": "pull_request",
     }
