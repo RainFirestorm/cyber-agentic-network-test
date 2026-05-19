@@ -1,0 +1,13 @@
+# DEMO PAYLOAD — Scenario 3: Supply Chain component
+# ----------------------------------------------------------------
+# DEADWIRE TRIGGER: Typosquatted packages
+# These are intentional misspellings of legitimate packages —
+# the same technique used in real supply chain attacks.
+# ----------------------------------------------------------------
+
+requets==2.28.2          # typosquat: 'requests'
+djano==4.2.1             # typosquat: 'django'
+nump==1.24.3             # typosquat: 'numpy'
+flask==2.3.2             # legitimate — DeadWire should pass this one
+pandas==2.0.1            # legitimate — DeadWire should pass this one
+pилlow==9.5.0            # typosquat: 'Pillow' (unicode lookalike attack)

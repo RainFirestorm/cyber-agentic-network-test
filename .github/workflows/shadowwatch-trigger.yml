@@ -1,0 +1,32 @@
+name: ShadowWatch - PR Behavioral Scanner
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  trigger-shadowwatch:
+    name: "ShadowWatch - scan PR (pull_request)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Trigger ShadowWatch scan
+        env:
+          DISPATCH_TOKEN: ${{ secrets.CAN_CI_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: python .github/scripts/shadowwatch_trigger.py

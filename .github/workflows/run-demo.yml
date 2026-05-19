@@ -1,0 +1,103 @@
+name: 🎯 Run Demo Scenario
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Which scenario to run"
+        required: true
+        type: choice
+        options:
+          - scenario-1-deadwire
+          - scenario-2-ipi-shield
+          - scenario-3-shadowwatch
+          - scenario-4-full-scan
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  launch-demo:
+    name: "Launch ${{ inputs.scenario }}"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set demo metadata
+        id: meta
+        run: |
+          SCENARIO="${{ inputs.scenario }}"
+          BRANCH="demo/${SCENARIO}-$(date +%s)"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+          if [ "$SCENARIO" = "scenario-1-deadwire" ]; then
+            echo "title=☠️ Demo 1: DeadWire — Code Analysis" >> $GITHUB_OUTPUT
+            echo "body=**Scenario 1 — DeadWire: Code Analysis**. DeadWire fires on hardcoded token + base64 backdoor + typosquatted dependencies. IPI Shield and ShadowWatch pass clean." >> $GITHUB_OUTPUT
+            echo "multi=false" >> $GITHUB_OUTPUT
+            echo "file=demos/scenario-1-deadwire/payload.py" >> $GITHUB_OUTPUT
+            echo "dest=sync_service.py" >> $GITHUB_OUTPUT
+
+          elif [ "$SCENARIO" = "scenario-2-ipi-shield" ]; then
+            echo "title=🛡️ Demo 2: IPI Shield — Content Analysis" >> $GITHUB_OUTPUT
+            echo "body=**Scenario 2 — IPI Shield: Content Analysis**. IPI Shield fires on poisoned RAG document with DAN jailbreak, role hijacking, and exfiltration trigger. DeadWire and ShadowWatch pass clean." >> $GITHUB_OUTPUT
+            echo "multi=false" >> $GITHUB_OUTPUT
+            echo "file=demos/scenario-2-ipi-shield/payload.txt" >> $GITHUB_OUTPUT
+            echo "dest=rag_document.txt" >> $GITHUB_OUTPUT
+
+          elif [ "$SCENARIO" = "scenario-3-shadowwatch" ]; then
+            echo "title=👁️ Demo 3: ShadowWatch — Behavioral Analysis" >> $GITHUB_OUTPUT
+            echo "body=**Scenario 3 — ShadowWatch: Behavioral Analysis**. ShadowWatch fires on multi-category sensitive path access across auth, config, and deploy simultaneously. DeadWire and IPI Shield pass clean." >> $GITHUB_OUTPUT
+            echo "multi=shadowwatch" >> $GITHUB_OUTPUT
+
+          elif [ "$SCENARIO" = "scenario-4-full-scan" ]; then
+            echo "title=🚨 Demo 4: Full CAN — All Three Scanners" >> $GITHUB_OUTPUT
+            echo "body=**Scenario 4 — Full Cyber Agentic Network**. All three scanners fire: IPI Shield catches prompt injection, DeadWire catches exposed AWS credential, ShadowWatch catches sensitive auth path access." >> $GITHUB_OUTPUT
+            echo "multi=fullscan" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create demo branch and payload
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b ${{ steps.meta.outputs.branch }}
+
+          SCENARIO="${{ inputs.scenario }}"
+
+          if [ "$SCENARIO" = "scenario-1-deadwire" ]; then
+            cp demos/scenario-1-deadwire/payload.py sync_service.py
+            cp demos/scenario-1-deadwire/requirements.txt requirements.txt
+            git add sync_service.py requirements.txt
+
+          elif [ "$SCENARIO" = "scenario-2-ipi-shield" ]; then
+            cp demos/scenario-2-ipi-shield/payload.txt rag_document.txt
+            git add rag_document.txt
+
+          elif [ "$SCENARIO" = "scenario-3-shadowwatch" ]; then
+            mkdir -p auth config deploy
+            cp demos/scenario-3-shadowwatch/auth/session_handler.py auth/session_handler.py
+            cp demos/scenario-3-shadowwatch/config/database_config.py config/database_config.py
+            cp demos/scenario-3-shadowwatch/deploy/startup.py deploy/startup.py
+            git add auth/ config/ deploy/
+
+          elif [ "$SCENARIO" = "scenario-4-full-scan" ]; then
+            mkdir -p auth
+            cp demos/scenario-4-full-scan/auth/compromised_handler.py auth/compromised_handler.py
+            git add auth/
+          fi
+
+          git commit -m "demo: ${{ inputs.scenario }}"
+          git push origin ${{ steps.meta.outputs.branch }}
+
+      - name: Open PR
+        env:
+          GH_TOKEN: ${{ secrets.CAN_CI_TOKEN }}
+        run: |
+          gh pr create \
+            --title "${{ steps.meta.outputs.title }}" \
+            --body "${{ steps.meta.outputs.body }}" \
+            --head ${{ steps.meta.outputs.branch }} \
+            --base main \
+            --repo ${{ github.repository }}
