@@ -6,7 +6,7 @@
 
 **Three independent AI security systems intercept every pull request in parallel — scanning for secrets, prompt injection, and insider threats — before a single line reaches production.**
 
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 [![Protected by DeadWire](https://img.shields.io/badge/Protected%20by-DeadWire-e94560.svg)](https://github.com/RainFirestorm/deadwire)
 [![Protected by IPI Shield](https://img.shields.io/badge/Protected%20by-IPI%20Shield-45e960.svg)](https://github.com/RainFirestorm/ipi-shield)
 [![Protected by ShadowWatch](https://img.shields.io/badge/Protected%20by-ShadowWatch-a855f7.svg)](https://github.com/RainFirestorm/shadow-watch)
@@ -242,7 +242,7 @@ For licensing inquiries, enterprise deployment discussions, or partnership oppor
 
 *Built to catch what static scanners miss.*
 
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
 [DeadWire](https://github.com/RainFirestorm/deadwire) · [IPI Shield](https://github.com/RainFirestorm/ipi-shield) · [ShadowWatch](https://github.com/RainFirestorm/shadow-watch) · [Commercial Licensing](#commercial-licensing)
 
